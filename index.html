@@ -5,49 +5,66 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sistem Surat Pengantar RT - Rambatan Wetan</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        
+        body { font-family: 'Inter', sans-serif; }
+
         @media print {
-            .no-print {
-                display: none !important;
-            }
+            .no-print { display: none !important; }
             .print-area {
                 border: none !important;
                 padding: 0 !important;
                 margin: 0 !important;
                 width: 100% !important;
-            }
-            body {
-                background-color: white !important;
+                box-shadow: none !important;
             }
         }
+
         .paper {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.5;
+            line-height: 1.4;
+            background-color: white;
         }
+
         #login-screen {
-            background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
         }
+
+        .input-focus:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
     </style>
 </head>
-<body class="bg-gray-100 min-h-screen">
+<body class="bg-slate-100 min-h-screen">
 
-    <!-- LAYAR LOGIN -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-white/20">
             <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 text-blue-700 rounded-full mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" />
+                    </svg>
+                </div>
                 <h1 class="text-2xl font-bold text-gray-800">Login Sistem RT</h1>
                 <p class="text-gray-500">Desa Rambatan Wetan</p>
             </div>
             <div class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Username</label>
-                    <input type="text" id="username" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan username">
+                    <input type="text" id="username" class="w-full p-3 border border-gray-300 rounded-lg outline-none input-focus" placeholder="Masukkan username">
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
                     <div class="relative">
-                        <input type="password" id="password" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none" placeholder="Masukkan password">
-                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-blue-600 focus:outline-none">
+                        <input type="password" id="password" class="w-full p-3 border border-gray-300 rounded-lg outline-none input-focus" placeholder="Masukkan password">
+                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600">
                             <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
@@ -55,156 +72,161 @@
                         </button>
                     </div>
                 </div>
-                <div id="login-error" class="hidden text-red-500 text-sm text-center font-medium">
+                <div id="login-error" class="hidden text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded">
                     Username atau Password salah!
                 </div>
-                <button onclick="handleLogin()" class="w-full bg-blue-700 hover:bg-blue-800 text-white font-bold py-3 rounded-lg transition-colors shadow-lg mt-4">
+                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all shadow-lg mt-4 active:scale-[0.98]">
                     Masuk ke Aplikasi
                 </button>
             </div>
         </div>
     </div>
 
-    <!-- APLIKASI UTAMA (HIDDEN BY DEFAULT) -->
     <div id="main-app" class="hidden p-4 md:p-8">
-        <div class="max-w-5xl mx-auto flex flex-col lg:flex-row gap-8">
+        <div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
             
-            <!-- BAGIAN INPUT (FORM) -->
-            <div class="w-full lg:w-1/3 bg-white p-6 rounded-xl shadow-lg no-print">
-                <div class="flex justify-between items-center mb-6 border-b pb-2">
-                    <h2 class="text-xl font-bold text-blue-700">Input Data Surat</h2>
-                    <button onclick="handleLogout()" class="text-xs text-red-500 hover:underline font-semibold">Keluar</button>
-                </div>
-                
-                <div class="space-y-4">
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">RT / RW</label>
-                        <div class="flex gap-2">
-                            <input type="text" id="in_rt" placeholder="RT" class="w-1/2 p-2 border rounded" oninput="updatePreview()">
-                            <input type="text" id="in_rw" placeholder="RW" class="w-1/2 p-2 border rounded" oninput="updatePreview()">
+            <div class="w-full lg:w-1/3 no-print">
+                <div class="bg-white p-6 rounded-2xl shadow-xl sticky top-8 border border-slate-200">
+                    <div class="flex justify-between items-center mb-6 border-b pb-4">
+                        <h2 class="text-xl font-bold text-blue-700">Data Surat</h2>
+                        <button onclick="handleLogout()" class="px-3 py-1 bg-red-50 text-red-600 rounded-md text-xs hover:bg-red-100 font-bold transition">Logout</button>
+                    </div>
+                    
+                    <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">RT</label>
+                                <input type="text" id="in_rt" placeholder="001" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold text-gray-500 uppercase mb-1">RW</label>
+                                <input type="text" id="in_rw" placeholder="003" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nomor Surat</label>
+                            <input type="text" id="in_nomor" placeholder="01 / RT 05 / III / 2024" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        </div>
+
+                        <hr class="border-dashed">
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nama Lengkap</label>
+                            <input type="text" id="in_nama" class="w-full p-2 border rounded-lg input-focus outline-none mb-2" oninput="updatePreview()">
+                            
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">NIK</label>
+                            <input type="text" id="in_nik" class="w-full p-2 border rounded-lg input-focus outline-none mb-2" oninput="updatePreview()">
+                            
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tempat, Tgl Lahir</label>
+                            <input type="text" id="in_ttl" placeholder="Indramayu, 01-01-1990" class="w-full p-2 border rounded-lg input-focus outline-none mb-2" oninput="updatePreview()">
+                            
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Jenis Kelamin</label>
+                            <select id="in_jk" class="w-full p-2 border rounded-lg input-focus outline-none mb-2" onchange="updatePreview()">
+                                <option value="">Pilih</option>
+                                <option value="Laki-laki">Laki-laki</option>
+                                <option value="Perempuan">Perempuan</option>
+                            </select>
+                            
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Agama</label>
+                            <input type="text" id="in_agama" class="w-full p-2 border rounded-lg input-focus outline-none mb-2" oninput="updatePreview()">
+                            
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Pekerjaan</label>
+                            <input type="text" id="in_pekerjaan" class="w-full p-2 border rounded-lg input-focus outline-none mb-2" oninput="updatePreview()">
+                            
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Alamat</label>
+                            <textarea id="in_alamat" rows="2" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Keperluan Surat</label>
+                            <textarea id="in_keperluan" rows="2" placeholder="Contoh: Pembuatan KTP / Domisili" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()"></textarea>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tanggal Surat</label>
+                            <input type="text" id="in_tgl_surat" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                         </div>
                     </div>
 
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Nomor Surat</label>
-                        <input type="text" id="in_nomor" placeholder="Contoh: 01 / RT 05 / III / 2024" class="w-full p-2 border rounded" oninput="updatePreview()">
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Data Warga</label>
-                        <input type="text" id="in_nama" placeholder="Nama Lengkap" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
-                        <input type="text" id="in_nik" placeholder="NIK" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
-                        <input type="text" id="in_ttl" placeholder="Tempat, Tgl Lahir" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
-                        <select id="in_jk" class="w-full p-2 border rounded mb-2" onchange="updatePreview()">
-                            <option value="">Pilih Jenis Kelamin</option>
-                            <option value="Laki-laki">Laki-laki</option>
-                            <option value="Perempuan">Perempuan</option>
-                        </select>
-                        <input type="text" id="in_agama" placeholder="Agama" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
-                        <input type="text" id="in_pekerjaan" placeholder="Pekerjaan" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
-                        <textarea id="in_alamat" placeholder="Alamat Lengkap" class="w-full p-2 border rounded mb-2" oninput="updatePreview()"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Keperluan Surat</label>
-                        <textarea id="in_keperluan" placeholder="Contoh: Pembuatan KTP / Domisili" class="w-full p-2 border rounded" oninput="updatePreview()"></textarea>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-semibold mb-1">Tanggal Surat</label>
-                        <input type="text" id="in_tgl_surat" placeholder="Contoh: 15 Maret 2024" class="w-full p-2 border rounded" oninput="updatePreview()">
-                    </div>
-
-                    <div class="flex flex-col gap-2 pt-4">
-                        <button onclick="sendEmail()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
-                            Kirim ke Email Kantor Desa
+                    <div class="flex flex-col gap-2 pt-6 mt-4 border-t">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="saveAsPDF()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl transition shadow flex flex-col items-center justify-center gap-1 active:scale-95">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M7.5 12 12 16.5m0 0L16.5 12M12 16.5V3" />
+                                </svg>
+                                <span class="text-xs">Download PDF</span>
+                            </button>
+                            <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl transition shadow flex flex-col items-center justify-center gap-1 active:scale-95">
+                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M6.72 13.89l-2.21 2.21A4.5 4.5 0 0 1 1.5 13V6a4.5 4.5 0 0 1 4.5-4.5h7.5A4.5 4.5 0 0 1 18 6v7a4.5 4.5 0 0 1-3.01 4.1l-2.21-2.21m-4.55-4.55l4.55 4.55m0 0l4.55-4.55m-4.55 4.55V3" />
+                                </svg>
+                                <span class="text-xs">Cetak Print</span>
+                            </button>
+                        </div>
+                        
+                        <button onclick="sendToAdminEmail()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl transition shadow flex items-center justify-center gap-2 active:scale-95">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                            </svg>
+                            <span class="text-sm">Kirim ke Admin Desa (Email)</span>
                         </button>
-                        <button onclick="window.print()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
-                            Download PDF / Cetak
-                        </button>
-                        <button onclick="resetForm()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition">
-                            Hapus Semua Data
-                        </button>
+
+                        <button onclick="resetForm()" class="text-red-500 text-[10px] mt-2 hover:underline text-center">Hapus Semua Data</button>
                     </div>
                 </div>
             </div>
 
-            <!-- BAGIAN PREVIEW SURAT -->
-            <div class="w-full lg:w-2/3 bg-white p-8 md:p-12 shadow-2xl rounded-sm print-area paper">
-                <!-- Header -->
-                <div class="text-center border-b-4 border-double border-black pb-4 mb-6">
-                    <h1 class="text-xl font-bold uppercase">Pemerintah Desa Rambatan Wetan</h1>
-                    <h1 class="text-xl font-bold uppercase">Kecamatan Sindang Kabupaten Indramayu</h1>
-                    <p class="text-sm font-bold mt-2">
-                        RT <span id="out_rt_head">……</span> / RW <span id="out_rw_head">……</span> 
-                        DESA RAMBATAN WETAN
-                    </p>
-                </div>
+            <div class="w-full lg:w-2/3 flex flex-col items-center">
+                <div id="print-paper" class="bg-white w-full p-10 md:p-16 shadow-2xl rounded-sm print-area paper border border-gray-200 relative">
+                    <div class="text-center border-b-4 border-double border-black pb-4 mb-6">
+                        <h1 class="text-xl font-bold uppercase tracking-tight">Pemerintah Desa Rambatan Wetan</h1>
+                        <h1 class="text-xl font-bold uppercase tracking-tight">Kecamatan Sindang Kabupaten Indramayu</h1>
+                        <p class="text-[16px] font-bold mt-2">
+                            RT <span id="out_rt_head">……</span> / RW <span id="out_rw_head">……</span> 
+                            DESA RAMBATAN WETAN
+                        </p>
+                    </div>
 
-                <!-- Identitas Surat -->
-                <div class="mb-6">
-                    <table class="w-full text-sm">
-                        <tr>
-                            <td width="15%">Nomor</td>
-                            <td width="2%">:</td>
-                            <td width="40%"><span id="out_nomor">…… / RT …… / …… / ……</span></td>
-                            <td align="right">Rambatan Wetan, <span id="out_tgl_header">........ 20.....</span></td>
-                        </tr>
-                        <tr>
-                            <td>Lampiran</td>
-                            <td>:</td>
-                            <td>-</td>
-                        </tr>
-                        <tr>
-                            <td>Perihal</td>
-                            <td>:</td>
-                            <td class="font-bold underline">Surat Pengantar</td>
-                        </tr>
-                    </table>
-                </div>
+                    <div class="mb-8 text-[15px]">
+                        <table class="w-full">
+                            <tr>
+                                <td width="15%">Nomor</td>
+                                <td width="2%">:</td>
+                                <td width="40%"><span id="out_nomor">…… / RT …… / …… / ……</span></td>
+                                <td align="right">Rambatan Wetan, <span id="out_tgl_header">........ 20.....</span></td>
+                            </tr>
+                        </table>
+                    </div>
 
-                <!-- Alamat Tujuan -->
-                <div class="mb-6 text-sm">
-                    <p>Kepada Yth.</p>
-                    <p class="font-bold">Kepala Desa Rambatan Wetan</p>
-                    <p>di</p>
-                    <p class="ml-4 italic">Tempat</p>
-                </div>
+                    <div class="text-[15px]">
+                        <p class="mb-4">Dengan hormat,</p>
+                        <p class="mb-6 text-justify leading-relaxed">
+                            Yang bertanda tangan di bawah ini Ketua RT <span id="out_rt_body">……</span> RW <span id="out_rw_body">……</span> Desa Rambatan Wetan menerangkan bahwa :
+                        </p>
 
-                <!-- Isi Surat -->
-                <div class="text-sm">
-                    <p class="mb-4">Dengan hormat,</p>
-                    <p class="mb-4 text-justify">
-                        Yang bertanda tangan di bawah ini Ketua RT <span id="out_rt_body">……</span> RW <span id="out_rw_body">……</span> Desa Rambatan Wetan Kecamatan Sindang Kabupaten Indramayu menerangkan bahwa :
-                    </p>
+                        <table class="w-full mb-6 ml-6 border-separate border-spacing-y-1">
+                            <tr><td width="30%">Nama</td><td width="2%">:</td><td class="font-bold uppercase" id="out_nama">.......................................................</td></tr>
+                            <tr><td>NIK</td><td>:</td><td id="out_nik">.......................................................</td></tr>
+                            <tr><td>Tempat / Tgl Lahir</td><td>:</td><td id="out_ttl">.......................................................</td></tr>
+                            <tr><td>Jenis Kelamin</td><td>:</td><td id="out_jk">.......................................................</td></tr>
+                            <tr><td>Agama</td><td>:</td><td id="out_agama">.......................................................</td></tr>
+                            <tr><td>Pekerjaan</td><td>:</td><td id="out_pekerjaan">.......................................................</td></tr>
+                            <tr><td valign="top">Alamat</td><td valign="top">:</td><td id="out_alamat">.......................................................</td></tr>
+                        </table>
 
-                    <table class="w-full mb-4 ml-6">
-                        <tr><td width="30%">Nama</td><td width="2%">:</td><td class="font-bold" id="out_nama">.......................................................</td></tr>
-                        <tr><td>NIK</td><td>:</td><td id="out_nik">.......................................................</td></tr>
-                        <tr><td>Tempat / Tanggal Lahir</td><td>:</td><td id="out_ttl">.......................................................</td></tr>
-                        <tr><td>Jenis Kelamin</td><td>:</td><td id="out_jk">.......................................................</td></tr>
-                        <tr><td>Agama</td><td>:</td><td id="out_agama">.......................................................</td></tr>
-                        <tr><td>Pekerjaan</td><td>:</td><td id="out_pekerjaan">.......................................................</td></tr>
-                        <tr><td valign="top">Alamat</td><td valign="top">:</td><td id="out_alamat">.......................................................</td></tr>
-                    </table>
+                        <p class="mb-6">Orang tersebut di atas adalah benar warga kami.</p>
+                        <p class="mb-1">Keperluan :</p>
+                        <p class="mb-8 font-bold border-b border-black inline-block min-w-[300px]" id="out_keperluan">..................................................................................</p>
+                        <p class="mb-12">Demikian surat pengantar ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+                    </div>
 
-                    <p class="mb-4 text-justify">
-                        Orang tersebut di atas adalah benar warga RT <span id="out_rt_footer">……</span> RW <span id="out_rw_footer">……</span> Desa Rambatan Wetan Kecamatan Sindang Kabupaten Indramayu.
-                    </p>
-
-                    <p class="mb-2">Surat pengantar ini dibuat untuk keperluan :</p>
-                    <p class="mb-4 font-bold border-b border-black inline-block min-w-[300px]" id="out_keperluan">..................................................................................</p>
-                    <p class="text-xs italic text-gray-500 no-print">(contoh: Pembuatan KTP / Kartu Keluarga / Akta / Surat Domisili / Sktm / dll)</p>
-
-                    <p class="mt-4 mb-10">Demikian surat pengantar ini dibuat dengan sebenarnya agar dapat dipergunakan sebagaimana mestinya.</p>
-                </div>
-
-                <!-- Tanda Tangan -->
-                <div class="flex justify-end mt-12 text-sm">
-                    <div class="text-center w-64">
-                        <p>Ketua RT <span id="out_rt_sign">……</span> RW <span id="out_rw_sign">……</span></p>
-                        <div class="h-24"></div>
-                        <p class="font-bold underline">( <span id="out_nama_sign">............................................</span> )</p>
+                    <div class="flex justify-end text-[15px]">
+                        <div class="text-center w-64">
+                            <p>Ketua RT <span id="out_rt_sign">……</span> RW <span id="out_rw_sign">……</span></p>
+                            <div class="h-24"></div>
+                            <p class="font-bold underline">( <span id="out_nama_sign">............................................</span> )</p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -212,52 +234,38 @@
     </div>
 
     <script>
-        // Data login
         const VALID_USER = "ramwet";
         const VALID_PASS = "istimewa03";
 
+        window.onload = () => {
+            const now = new Date();
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            document.getElementById('in_tgl_surat').value = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+            updatePreview();
+        };
+
         function togglePassword() {
             const passInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eye-icon');
-            
-            if (passInput.type === 'password') {
-                passInput.type = 'text';
-                // Ganti ikon ke mata terbuka dengan garis coret (ikon hide)
-                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />`;
-            } else {
-                passInput.type = 'password';
-                // Kembali ke ikon mata terbuka (ikon show)
-                eyeIcon.innerHTML = `<path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />`;
-            }
+            passInput.type = passInput.type === 'password' ? 'text' : 'password';
         }
 
         function handleLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
-            const errorMsg = document.getElementById('login-error');
-
             if (user === VALID_USER && pass === VALID_PASS) {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
-                errorMsg.classList.add('hidden');
             } else {
-                errorMsg.classList.remove('hidden');
-                document.getElementById('password').value = '';
+                document.getElementById('login-error').classList.remove('hidden');
             }
         }
 
-        function handleLogout() {
-            location.reload(); 
-        }
-
-        document.getElementById('password').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') handleLogin();
-        });
+        function handleLogout() { location.reload(); }
 
         function updatePreview() {
             const mappings = {
-                'in_rt': ['out_rt_head', 'out_rt_body', 'out_rt_footer', 'out_rt_sign'],
-                'in_rw': ['out_rw_head', 'out_rw_body', 'out_rw_footer', 'out_rw_sign'],
+                'in_rt': ['out_rt_head', 'out_rt_body', 'out_rt_sign'],
+                'in_rw': ['out_rw_head', 'out_rw_body', 'out_rw_sign'],
                 'in_nomor': ['out_nomor'],
                 'in_nama': ['out_nama', 'out_nama_sign'],
                 'in_nik': ['out_nik'],
@@ -274,38 +282,63 @@
                 let val = document.getElementById(id).value;
                 mappings[id].forEach(targetId => {
                     let target = document.getElementById(targetId);
-                    if (val) {
-                        target.innerText = val;
-                        target.classList.remove('text-gray-400');
-                    } else {
-                        if (targetId.includes('rt') || targetId.includes('rw')) target.innerText = '……';
-                        else if (targetId === 'out_nomor') target.innerText = '…… / RT …… / …… / ……';
-                        else target.innerText = '.......................................................';
-                    }
+                    if (val) target.innerText = val;
+                    else target.innerText = targetId.includes('rt') || targetId.includes('rw') ? '……' : '.......................................................';
                 });
             }
         }
 
-        function resetForm() {
-            if (confirm('Apakah Anda yakin ingin menghapus semua data yang telah diketik?')) {
-                const inputs = ['in_rt', 'in_rw', 'in_nomor', 'in_nama', 'in_nik', 'in_ttl', 'in_jk', 'in_agama', 'in_pekerjaan', 'in_alamat', 'in_keperluan', 'in_tgl_surat'];
-                inputs.forEach(id => document.getElementById(id).value = '');
-                updatePreview();
-            }
+        // FUNGSI DOWNLOAD PDF
+        function saveAsPDF() {
+            const element = document.getElementById('print-paper');
+            const namaWarga = document.getElementById('in_nama').value || 'Warga';
+            const opt = {
+                margin: 0.5,
+                filename: `Surat_Pengantar_${namaWarga}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
         }
 
-        function sendEmail() {
-            const email = "rambatanwetan03@gmail.com";
-            const nama = document.getElementById('in_nama').value || "(Tanpa Nama)";
-            const nik = document.getElementById('in_nik').value || "-";
-            const keperluan = document.getElementById('in_keperluan').value || "-";
-            const rt = document.getElementById('in_rt').value || "-";
-            const rw = document.getElementById('in_rw').value || "-";
+        // FUNGSI KIRIM EMAIL KE ADMIN DESA
+        function sendToAdminEmail() {
+            const emailTujuan = "rambatanwetan03@gmail.com";
+            
+            // Ambil data dari input
+            const nama = document.getElementById('in_nama').value || "(Belum diisi)";
+            const nik = document.getElementById('in_nik').value || "(Belum diisi)";
+            const rt = document.getElementById('in_rt').value || "…";
+            const rw = document.getElementById('in_rw').value || "…";
+            const keperluan = document.getElementById('in_keperluan').value || "(Belum diisi)";
+            const tgl = document.getElementById('in_tgl_surat').value;
 
-            const subject = `Surat Pengantar RT ${rt}/RW ${rw} - ${nama}`;
-            const body = `Halo Pemerintah Desa Rambatan Wetan,%0D%0A%0D%0ABerikut adalah data Surat Pengantar Baru:%0D%0A%0D%0ANama: ${nama}%0D%0ANIK: ${nik}%0D%0ART/RW: ${rt}/${rw}%0D%0AKeperluan: ${keperluan}%0D%0A%0D%0AMohon diproses lebih lanjut. Terima kasih.`;
+            // Susun Subjek dan Isi Pesan
+            const subject = encodeURIComponent(`LAPORAN SURAT PENGANTAR RT ${rt}/RW ${rw} - ${nama}`);
+            const body = encodeURIComponent(
+                `Yth. Admin Desa Rambatan Wetan,\n\n` +
+                `Berikut adalah data pengajuan Surat Pengantar dari Ketua RT:\n\n` +
+                `--------------------------------------------------\n` +
+                `NAMA          : ${nama}\n` +
+                `NIK           : ${nik}\n` +
+                `RT / RW       : ${rt} / ${rw}\n` +
+                `KEPERLUAN     : ${keperluan}\n` +
+                `TANGGAL SURAT : ${tgl}\n` +
+                `--------------------------------------------------\n\n` +
+                `Mohon untuk dapat ditindaklanjuti. Terima kasih.`
+            );
 
-            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+            // Buka aplikasi email default
+            window.location.href = `mailto:${emailTujuan}?subject=${subject}&body=${body}`;
+        }
+
+        function resetForm() {
+            if (confirm('Hapus semua data input?')) {
+                const ids = ['in_rt', 'in_rw', 'in_nomor', 'in_nama', 'in_nik', 'in_ttl', 'in_jk', 'in_agama', 'in_pekerjaan', 'in_alamat', 'in_keperluan'];
+                ids.forEach(id => document.getElementById(id).value = '');
+                updatePreview();
+            }
         }
     </script>
 </body>
