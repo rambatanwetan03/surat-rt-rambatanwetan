@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Surat Pengantar RT - Rambatan Wetan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @media print {
+            .no-print {
+                display: none !important;
+            }
+            .print-area {
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+            body {
+                background-color: white !important;
+            }
+        }
+        .paper {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 min-h-screen p-4 md:p-8">
+
+    <div class="max-w-5xl mx-auto flex flex-col lg:flex-row gap-8">
+        
+        <!-- BAGIAN INPUT (FORM) -->
+        <div class="w-full lg:w-1/3 bg-white p-6 rounded-xl shadow-lg no-print">
+            <h2 class="text-xl font-bold mb-6 border-b pb-2 text-blue-700">Input Data Surat</h2>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold mb-1">RT / RW</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="in_rt" placeholder="RT" class="w-1/2 p-2 border rounded" oninput="updatePreview()">
+                        <input type="text" id="in_rw" placeholder="RW" class="w-1/2 p-2 border rounded" oninput="updatePreview()">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Nomor Surat</label>
+                    <input type="text" id="in_nomor" placeholder="Contoh: 01 / RT 05 / III / 2024" class="w-full p-2 border rounded" oninput="updatePreview()">
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Data Warga</label>
+                    <input type="text" id="in_nama" placeholder="Nama Lengkap" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
+                    <input type="text" id="in_nik" placeholder="NIK" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
+                    <input type="text" id="in_ttl" placeholder="Tempat, Tgl Lahir" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
+                    <select id="in_jk" class="w-full p-2 border rounded mb-2" onchange="updatePreview()">
+                        <option value="">Pilih Jenis Kelamin</option>
+                        <option value="Laki-laki">Laki-laki</option>
+                        <option value="Perempuan">Perempuan</option>
+                    </select>
+                    <input type="text" id="in_agama" placeholder="Agama" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
+                    <input type="text" id="in_pekerjaan" placeholder="Pekerjaan" class="w-full p-2 border rounded mb-2" oninput="updatePreview()">
+                    <textarea id="in_alamat" placeholder="Alamat Lengkap" class="w-full p-2 border rounded mb-2" oninput="updatePreview()"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Keperluan Surat</label>
+                    <textarea id="in_keperluan" placeholder="Contoh: Pembuatan KTP / Domisili" class="w-full p-2 border rounded" oninput="updatePreview()"></textarea>
+                </div>
+
+                <div>
+                    <label class="block text-sm font-semibold mb-1">Tanggal Surat</label>
+                    <input type="text" id="in_tgl_surat" placeholder="Contoh: 15 Maret 2024" class="w-full p-2 border rounded" oninput="updatePreview()">
+                </div>
+
+                <div class="flex flex-col gap-2 pt-4">
+                    <button onclick="sendEmail()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition">
+                        Kirim ke Email Kantor Desa
+                    </button>
+                    <button onclick="window.print()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition">
+                        Download PDF / Cetak
+                    </button>
+                    <button onclick="resetForm()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded transition">
+                        Hapus Semua Data
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- BAGIAN PREVIEW SURAT -->
+        <div class="w-full lg:w-2/3 bg-white p-8 md:p-12 shadow-2xl rounded-sm print-area paper">
+            <!-- Header -->
+            <div class="text-center border-b-4 border-double border-black pb-4 mb-6">
+                <h1 class="text-xl font-bold uppercase">Pemerintah Desa Rambatan Wetan</h1>
+                <h1 class="text-xl font-bold uppercase">Kecamatan Sindang Kabupaten Indramayu</h1>
+                <p class="text-sm font-bold mt-2">
+                    RT <span id="out_rt_head">……</span> / RW <span id="out_rw_head">……</span> 
+                    DESA RAMBATAN WETAN
+                </p>
+            </div>
+
+            <!-- Identitas Surat -->
+            <div class="mb-6">
+                <table class="w-full text-sm">
+                    <tr>
+                        <td width="15%">Nomor</td>
+                        <td width="2%">:</td>
+                        <td width="40%"><span id="out_nomor">…… / RT …… / …… / ……</span></td>
+                        <td align="right">Rambatan Wetan, <span id="out_tgl_header">........ 20.....</span></td>
+                    </tr>
+                    <tr>
+                        <td>Lampiran</td>
+                        <td>:</td>
+                        <td>-</td>
+                    </tr>
+                    <tr>
+                        <td>Perihal</td>
+                        <td>:</td>
+                        <td class="font-bold underline">Surat Pengantar</td>
+                    </tr>
+                </table>
+            </div>
+
+            <!-- Alamat Tujuan -->
+            <div class="mb-6 text-sm">
+                <p>Kepada Yth.</p>
+                <p class="font-bold">Kepala Desa Rambatan Wetan</p>
+                <p>di</p>
+                <p class="ml-4 italic">Tempat</p>
+            </div>
+
+            <!-- Isi Surat -->
+            <div class="text-sm">
+                <p class="mb-4">Dengan hormat,</p>
+                <p class="mb-4 text-justify">
+                    Yang bertanda tangan di bawah ini Ketua RT <span id="out_rt_body">……</span> RW <span id="out_rw_body">……</span> Desa Rambatan Wetan Kecamatan Sindang Kabupaten Indramayu menerangkan bahwa :
+                </p>
+
+                <table class="w-full mb-4 ml-6">
+                    <tr><td width="30%">Nama</td><td width="2%">:</td><td class="font-bold" id="out_nama">.......................................................</td></tr>
+                    <tr><td>NIK</td><td>:</td><td id="out_nik">.......................................................</td></tr>
+                    <tr><td>Tempat / Tanggal Lahir</td><td>:</td><td id="out_ttl">.......................................................</td></tr>
+                    <tr><td>Jenis Kelamin</td><td>:</td><td id="out_jk">.......................................................</td></tr>
+                    <tr><td>Agama</td><td>:</td><td id="out_agama">.......................................................</td></tr>
+                    <tr><td>Pekerjaan</td><td>:</td><td id="out_pekerjaan">.......................................................</td></tr>
+                    <tr><td valign="top">Alamat</td><td valign="top">:</td><td id="out_alamat">.......................................................</td></tr>
+                </table>
+
+                <p class="mb-4 text-justify">
+                    Orang tersebut di atas adalah benar warga RT <span id="out_rt_footer">……</span> RW <span id="out_rw_footer">……</span> Desa Rambatan Wetan Kecamatan Sindang Kabupaten Indramayu.
+                </p>
+
+                <p class="mb-2">Surat pengantar ini dibuat untuk keperluan :</p>
+                <p class="mb-4 font-bold border-b border-black inline-block min-w-[300px]" id="out_keperluan">..................................................................................</p>
+                <p class="text-xs italic text-gray-500 no-print">(contoh: Pembuatan KTP / Kartu Keluarga / Akta / Surat Domisili / Sktm / dll)</p>
+
+                <p class="mt-4 mb-10">Demikian surat pengantar ini dibuat dengan sebenarnya agar dapat dipergunakan sebagaimana mestinya.</p>
+            </div>
+
+            <!-- Tanda Tangan -->
+            <div class="flex justify-end mt-12 text-sm">
+                <div class="text-center w-64">
+                    <p>Ketua RT <span id="out_rt_sign">……</span> RW <span id="out_rw_sign">……</span></p>
+                    <div class="h-24"></div>
+                    <p class="font-bold underline">( <span id="out_nama_sign">............................................</span> )</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function updatePreview() {
+            // Mapping input ke output
+            const mappings = {
+                'in_rt': ['out_rt_head', 'out_rt_body', 'out_rt_footer', 'out_rt_sign'],
+                'in_rw': ['out_rw_head', 'out_rw_body', 'out_rw_footer', 'out_rw_sign'],
+                'in_nomor': ['out_nomor'],
+                'in_nama': ['out_nama', 'out_nama_sign'],
+                'in_nik': ['out_nik'],
+                'in_ttl': ['out_ttl'],
+                'in_jk': ['out_jk'],
+                'in_agama': ['out_agama'],
+                'in_pekerjaan': ['out_pekerjaan'],
+                'in_alamat': ['out_alamat'],
+                'in_keperluan': ['out_keperluan'],
+                'in_tgl_surat': ['out_tgl_header']
+            };
+
+            for (let id in mappings) {
+                let val = document.getElementById(id).value;
+                mappings[id].forEach(targetId => {
+                    let target = document.getElementById(targetId);
+                    if (val) {
+                        target.innerText = val;
+                        target.classList.remove('text-gray-400');
+                    } else {
+                        // Kembali ke placeholder awal jika kosong
+                        if (targetId.includes('rt') || targetId.includes('rw')) target.innerText = '……';
+                        else if (targetId === 'out_nomor') target.innerText = '…… / RT …… / …… / ……';
+                        else target.innerText = '.......................................................';
+                    }
+                });
+            }
+        }
+
+        function resetForm() {
+            if (confirm('Apakah Anda yakin ingin menghapus semua data yang telah diketik?')) {
+                const inputs = ['in_rt', 'in_rw', 'in_nomor', 'in_nama', 'in_nik', 'in_ttl', 'in_jk', 'in_agama', 'in_pekerjaan', 'in_alamat', 'in_keperluan', 'in_tgl_surat'];
+                inputs.forEach(id => document.getElementById(id).value = '');
+                updatePreview();
+            }
+        }
+
+        function sendEmail() {
+            const email = "rambatanwetan03@gmail.com";
+            const nama = document.getElementById('in_nama').value || "(Tanpa Nama)";
+            const nik = document.getElementById('in_nik').value || "-";
+            const keperluan = document.getElementById('in_keperluan').value || "-";
+            const rt = document.getElementById('in_rt').value || "-";
+            const rw = document.getElementById('in_rw').value || "-";
+
+            const subject = `Surat Pengantar RT ${rt}/RW ${rw} - ${nama}`;
+            const body = `Halo Pemerintah Desa Rambatan Wetan,%0D%0A%0D%0ABerikut adalah data Surat Pengantar Baru:%0D%0A%0D%0ANama: ${nama}%0D%0ANIK: ${nik}%0D%0ART/RW: ${rt}/${rw}%0D%0AKeperluan: ${keperluan}%0D%0A%0D%0AMohon diproses lebih lanjut. Terima kasih.`;
+
+            window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
+        }
+    </script>
+</body>
+</html>
