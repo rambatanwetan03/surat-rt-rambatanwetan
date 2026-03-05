@@ -48,7 +48,7 @@
                 <h1 class="text-2xl font-bold text-gray-800">Login Sistem RT</h1>
                 <p class="text-gray-500">Desa Rambatan Wetan</p>
             </div>
-            <div class="space-y-4">
+            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Username</label>
                     <input type="text" id="username" class="w-full p-3 border border-gray-300 rounded-lg outline-none input-focus" placeholder="Username">
@@ -60,10 +60,10 @@
                 <div id="login-error" class="hidden text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded">
                     Login gagal! Periksa kembali akses Anda.
                 </div>
-                <button onclick="handleLogin()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all shadow-lg mt-4 active:scale-95">
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all shadow-lg mt-4 active:scale-95">
                     Masuk
                 </button>
-            </div>
+            </form>
         </div>
     </div>
 
@@ -74,7 +74,7 @@
                 <div class="bg-white p-6 rounded-2xl shadow-xl sticky top-8 border border-slate-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold text-blue-700">Data Surat</h2>
-                        <button onclick="handleLogout()" class="text-red-600 font-bold text-xs uppercase">Logout</button>
+                        <button onclick="handleLogout()" class="px-3 py-1 bg-red-50 text-red-600 rounded-md text-[10px] font-bold hover:bg-red-100 transition uppercase">Keluar (Logout)</button>
                     </div>
                     
                     <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
@@ -162,7 +162,16 @@
         const VALID_USER = "ramwet";
         const VALID_PASS = "istimewa03";
 
+        // FUNGSI CEK STATUS LOGIN SAAT HALAMAN DIMUAT
         window.onload = () => {
+            const isLoggedIn = localStorage.getItem("isLoggedIn");
+            
+            if (isLoggedIn === "true") {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+            }
+
+            // Atur tanggal otomatis
             const now = new Date();
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             document.getElementById('in_tgl_surat').value = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
@@ -172,7 +181,11 @@
         function handleLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
+            
             if (user === VALID_USER && pass === VALID_PASS) {
+                // Simpan status login ke localStorage
+                localStorage.setItem("isLoggedIn", "true");
+                
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
             } else {
@@ -180,7 +193,13 @@
             }
         }
 
-        function handleLogout() { location.reload(); }
+        function handleLogout() {
+            if(confirm("Apakah Anda yakin ingin keluar dari aplikasi?")) {
+                // Hapus status login
+                localStorage.removeItem("isLoggedIn");
+                location.reload(); // Refresh untuk kembali ke layar login
+            }
+        }
 
         function updatePreview() {
             const mappings = {
@@ -237,7 +256,7 @@
                 `NIK: ${nik}\n` +
                 `RT/RW: ${rt}/${rw}\n` +
                 `Keperluan: ${keperluan}\n\n` +
-                `Pesan ini dikirimkan otomatis setelah pengisian formulir oleh Ketua RT. Terima kasih.`
+                `Terima kasih.`
             );
             
             window.location.href = `mailto:${emailTujuan}?subject=${subject}&body=${body}`;
