@@ -37,6 +37,7 @@
 </head>
 <body class="bg-slate-100 min-h-screen">
 
+    <!-- LOGIN SCREEN -->
     <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
         <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-white/20">
             <div class="text-center mb-8">
@@ -67,20 +68,22 @@
         </div>
     </div>
 
+    <!-- MAIN APP -->
     <div id="main-app" class="hidden p-4 md:p-8">
         <div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
             
+            <!-- Sidebar Input -->
             <div class="w-full lg:w-1/3 no-print">
                 <div class="bg-white p-6 rounded-2xl shadow-xl sticky top-8 border border-slate-200">
                     <div class="flex justify-between items-center mb-6">
                         <h2 class="text-xl font-bold text-blue-700">Data Surat</h2>
-                        <button onclick="handleLogout()" class="px-3 py-1 bg-red-50 text-red-600 rounded-md text-[10px] font-bold hover:bg-red-100 transition uppercase">Keluar (Logout)</button>
+                        <button onclick="handleLogout()" class="px-3 py-1 bg-red-50 text-red-600 rounded-md text-[10px] font-bold hover:bg-red-100 transition uppercase">Logout</button>
                     </div>
                     
                     <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="in_rt" placeholder="RT (Misal: 001)" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
-                            <input type="text" id="in_rw" placeholder="RW (Misal: 003)" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                            <input type="text" id="in_rt" placeholder="RT" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                            <input type="text" id="in_rw" placeholder="RW" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                         </div>
                         <input type="text" id="in_nomor" placeholder="Nomor Surat" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                         <input type="text" id="in_nama" placeholder="Nama Lengkap" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
@@ -100,17 +103,18 @@
 
                     <div class="flex flex-col gap-2 pt-6 mt-4 border-t">
                         <div class="grid grid-cols-2 gap-2">
-                            <button onclick="saveAsPDF()" class="bg-red-600 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase">Download PDF</button>
-                            <button onclick="window.print()" class="bg-emerald-600 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase">Cetak Print</button>
+                            <button onclick="saveAsPDF()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase">Download PDF</button>
+                            <button onclick="window.print()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase">Cetak Print</button>
                         </div>
-                        <button onclick="sendToAdminEmail()" class="bg-blue-600 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase tracking-wide">Kirim ke Admin Desa</button>
+                        <button onclick="sendToAdminEmail()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase tracking-wide">Kirim ke Admin Desa</button>
                         <button onclick="resetForm()" class="text-gray-400 text-[10px] mt-2 hover:underline">Kosongkan Formulir</button>
                     </div>
                 </div>
             </div>
 
+            <!-- Preview Surat -->
             <div class="w-full lg:w-2/3 flex flex-col items-center">
-                <div id="print-paper" class="bg-white w-full p-10 md:p-16 shadow-2xl rounded-sm print-area paper border border-gray-200">
+                <div id="print-paper" class="bg-white w-full p-10 md:p-16 shadow-2xl rounded-sm print-area paper border border-gray-200 min-h-[1000px]">
                     <div class="text-center border-b-4 border-double border-black pb-4 mb-4">
                         <h1 class="text-xl font-bold uppercase tracking-tight">Pemerintah Desa Rambatan Wetan</h1>
                         <h1 class="text-xl font-bold uppercase tracking-tight">Kecamatan Sindang Kabupaten Indramayu</h1>
@@ -162,16 +166,13 @@
         const VALID_USER = "ramwet";
         const VALID_PASS = "istimewa03";
 
-        // FUNGSI CEK STATUS LOGIN SAAT HALAMAN DIMUAT
         window.onload = () => {
             const isLoggedIn = localStorage.getItem("isLoggedIn");
-            
             if (isLoggedIn === "true") {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
             }
 
-            // Atur tanggal otomatis
             const now = new Date();
             const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
             document.getElementById('in_tgl_surat').value = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
@@ -181,11 +182,8 @@
         function handleLogin() {
             const user = document.getElementById('username').value;
             const pass = document.getElementById('password').value;
-            
             if (user === VALID_USER && pass === VALID_PASS) {
-                // Simpan status login ke localStorage
                 localStorage.setItem("isLoggedIn", "true");
-                
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
             } else {
@@ -194,10 +192,9 @@
         }
 
         function handleLogout() {
-            if(confirm("Apakah Anda yakin ingin keluar dari aplikasi?")) {
-                // Hapus status login
+            if(confirm("Apakah Anda yakin ingin keluar?")) {
                 localStorage.removeItem("isLoggedIn");
-                location.reload(); // Refresh untuk kembali ke layar login
+                location.reload();
             }
         }
 
@@ -218,7 +215,8 @@
             };
 
             for (let id in mappings) {
-                let val = document.getElementById(id).value;
+                let el = document.getElementById(id);
+                let val = el ? el.value : '';
                 mappings[id].forEach(targetId => {
                     let target = document.getElementById(targetId);
                     if (val) target.innerText = val;
@@ -232,7 +230,7 @@
             const namaWarga = document.getElementById('in_nama').value || 'Warga';
             const opt = {
                 margin: 0.5,
-                filename: `Surat_Pengantar_${namaWarga}.pdf`,
+                filename: `Surat_Pengantar_${namaWarga.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
                 html2canvas: { scale: 2 },
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
@@ -242,30 +240,51 @@
 
         function sendToAdminEmail() {
             const emailTujuan = "rambatanwetan03@gmail.com";
-            const nama = document.getElementById('in_nama').value || "-";
-            const rt = document.getElementById('in_rt').value || "-";
-            const rw = document.getElementById('in_rw').value || "-";
-            const nik = document.getElementById('in_nik').value || "-";
-            const keperluan = document.getElementById('in_keperluan').value || "-";
             
-            const subject = encodeURIComponent(`SURAT PENGANTAR RT ${rt}/RW ${rw} - ${nama}`);
-            const body = encodeURIComponent(
-                `Yth. Admin Desa Rambatan Wetan,\n\n` +
-                `Telah dikirimkan data pengajuan Surat Pengantar:\n` +
-                `Nama: ${nama}\n` +
-                `NIK: ${nik}\n` +
-                `RT/RW: ${rt}/${rw}\n` +
-                `Keperluan: ${keperluan}\n\n` +
-                `Terima kasih.`
-            );
+            // Mengambil data terbaru dari input
+            const nama = document.getElementById('in_nama').value || "(Belum diisi)";
+            const rt = document.getElementById('in_rt').value || "……";
+            const rw = document.getElementById('in_rw').value || "……";
+            const nik = document.getElementById('in_nik').value || "(Belum diisi)";
+            const keperluan = document.getElementById('in_keperluan').value || "(Belum diisi)";
+            const nomor = document.getElementById('in_nomor').value || "……";
             
-            window.location.href = `mailto:${emailTujuan}?subject=${subject}&body=${body}`;
+            // Format Subject
+            const subject = `PENGAJUAN SURAT PENGANTAR RT ${rt}/RW ${rw} - ${nama}`;
+            
+            // Format Body (Menggunakan \r\n untuk baris baru yang lebih kompatibel)
+            const body = 
+                `Yth. Admin Desa Rambatan Wetan,\r\n\r\n` +
+                `Berikut adalah data pengajuan Surat Pengantar RT:\r\n\r\n` +
+                `----------------------------------------\r\n` +
+                `NOMOR SURAT : ${nomor}\r\n` +
+                `NAMA        : ${nama}\r\n` +
+                `NIK         : ${nik}\r\n` +
+                `RT / RW     : ${rt} / ${rw}\r\n` +
+                `KEPERLUAN   : ${keperluan}\r\n` +
+                `----------------------------------------\r\n\r\n` +
+                `Mohon segera diproses lebih lanjut. Terima kasih.`;
+
+            // Membuat link mailto dengan encoding yang benar
+            const mailtoUrl = `mailto:${emailTujuan}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            
+            // Menggunakan window.open untuk memicu klien email
+            const mailWindow = window.open(mailtoUrl, '_blank');
+            
+            // Jika browser memblokir popup atau window.open gagal
+            if (!mailWindow || mailWindow.closed || typeof mailWindow.closed == 'undefined') {
+                // Fallback menggunakan lokasi href
+                window.location.href = mailtoUrl;
+            }
         }
 
         function resetForm() {
             if(confirm('Hapus semua data yang sudah diisi?')) {
                 const inputs = ['in_rt', 'in_rw', 'in_nomor', 'in_nama', 'in_nik', 'in_ttl', 'in_jk', 'in_agama', 'in_pekerjaan', 'in_alamat', 'in_keperluan'];
-                inputs.forEach(id => document.getElementById(id).value = '');
+                inputs.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.value = '';
+                });
                 updatePreview();
             }
         }
