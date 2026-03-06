@@ -18,7 +18,7 @@
 
         .paper {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.5;
+            line-height: 1.2;
             background-color: white;
         }
 
@@ -119,12 +119,12 @@
             <div class="w-full lg:w-2/3 flex flex-col items-center">
                 <div id="print-paper" class="bg-white w-full p-10 md:p-16 shadow-2xl rounded-sm print-area paper border border-gray-200 min-h-[1000px]">
                     
-                    <div class="flex items-center border-b-4 border-double border-black pb-4 mb-4">
-                        <div class="w-24 h-24 mr-4 flex-shrink-0">
-                            <img src="LOGO PEMDES RAMBATAN WETAN.jpg" alt="Logo Desa" class="w-full h-full object-contain">
-                        </div>
-                        <div class="flex-grow text-center pr-24"> <h1 class="text-xl font-bold uppercase tracking-tight">Pemerintah Desa Rambatan Wetan</h1>
-                            <h1 class="text-xl font-bold uppercase tracking-tight">Kecamatan Sindang Kabupaten Indramayu</h1>
+                    <div class="flex items-center border-b-4 border-double border-black pb-4 mb-4 relative">
+                        <img src="./LOGO%20PEMDES%20RAMBATAN%20WETAN.jpg" alt="Logo" class="w-24 h-24 absolute left-0 top-0">
+                        
+                        <div class="w-full text-center px-24">
+                            <h1 class="text-xl font-bold uppercase leading-tight">Pemerintah Desa Rambatan Wetan</h1>
+                            <h1 class="text-xl font-bold uppercase leading-tight">Kecamatan Sindang Kabupaten Indramayu</h1>
                             <p class="text-[16px] font-bold mt-2 uppercase">RT <span id="out_rt_head">……</span> / RW <span id="out_rw_head">……</span> DESA RAMBATAN WETAN</p>
                         </div>
                     </div>
@@ -284,7 +284,7 @@
                 margin: 0.5,
                 filename: `Surat_RT_${nama.replace(/\s+/g, '_')}.pdf`,
                 image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
+                html2canvas: { scale: 2, useCORS: true },
                 jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
