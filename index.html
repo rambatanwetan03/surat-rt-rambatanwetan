@@ -118,10 +118,15 @@
 
             <div class="w-full lg:w-2/3 flex flex-col items-center">
                 <div id="print-paper" class="bg-white w-full p-10 md:p-16 shadow-2xl rounded-sm print-area paper border border-gray-200 min-h-[1000px]">
-                    <div class="text-center border-b-4 border-double border-black pb-4 mb-4">
-                        <h1 class="text-xl font-bold uppercase tracking-tight">Pemerintah Desa Rambatan Wetan</h1>
-                        <h1 class="text-xl font-bold uppercase tracking-tight">Kecamatan Sindang Kabupaten Indramayu</h1>
-                        <p class="text-[16px] font-bold mt-2 uppercase">RT <span id="out_rt_head">……</span> / RW <span id="out_rw_head">……</span> DESA RAMBATAN WETAN</p>
+                    
+                    <div class="flex items-center border-b-4 border-double border-black pb-4 mb-4">
+                        <div class="w-24 h-24 mr-4 flex-shrink-0">
+                            <img src="LOGO PEMDES RAMBATAN WETAN.jpg" alt="Logo Desa" class="w-full h-full object-contain">
+                        </div>
+                        <div class="flex-grow text-center pr-24"> <h1 class="text-xl font-bold uppercase tracking-tight">Pemerintah Desa Rambatan Wetan</h1>
+                            <h1 class="text-xl font-bold uppercase tracking-tight">Kecamatan Sindang Kabupaten Indramayu</h1>
+                            <p class="text-[16px] font-bold mt-2 uppercase">RT <span id="out_rt_head">……</span> / RW <span id="out_rw_head">……</span> DESA RAMBATAN WETAN</p>
+                        </div>
                     </div>
 
                     <div class="text-center mb-6">
@@ -171,19 +176,16 @@
         const INPUT_IDS = ['in_rt', 'in_rw', 'in_nomor', 'in_nama', 'in_nik', 'in_ttl', 'in_jk', 'in_agama', 'in_pekerjaan', 'in_alamat', 'in_keperluan', 'in_tgl_surat'];
 
         window.onload = () => {
-            // Cek status login
             if (localStorage.getItem("isLoggedIn") === "true") {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
             }
 
-            // Load draft data dari penyimpanan lokal
             INPUT_IDS.forEach(id => {
                 const savedVal = localStorage.getItem(`draft_${id}`);
                 if (savedVal) document.getElementById(id).value = savedVal;
             });
 
-            // Set tanggal hari ini jika kosong
             if(!document.getElementById('in_tgl_surat').value) {
                 const now = new Date();
                 const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -232,7 +234,6 @@
                 const el = document.getElementById(id);
                 const val = el ? el.value : '';
                 
-                // Simpan otomatis ke memori browser
                 if(val) localStorage.setItem(`draft_${id}`, val);
 
                 mappings[id].forEach(targetId => {
