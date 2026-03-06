@@ -18,8 +18,9 @@
 
         .paper {
             font-family: 'Times New Roman', Times, serif;
-            line-height: 1.5;
+            line-height: 1.6;
             background-color: white;
+            color: black;
         }
 
         #login-screen {
@@ -34,6 +35,14 @@
         .custom-scrollbar::-webkit-scrollbar { width: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        /* Memastikan PDF memiliki ukuran A4 yang konsisten */
+        .pdf-content {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: auto;
+        }
     </style>
 </head>
 <body class="bg-slate-100 min-h-screen">
@@ -69,7 +78,7 @@
     </div>
 
     <div id="main-app" class="hidden p-4 md:p-8">
-        <div class="max-w-6xl mx-auto flex flex-col lg:flex-row gap-8">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
             
             <div class="w-full lg:w-1/3 no-print">
                 <div class="bg-white p-6 rounded-2xl shadow-xl sticky top-8 border border-slate-200">
@@ -78,14 +87,14 @@
                         <button onclick="handleLogout()" class="px-3 py-1 bg-red-50 text-red-600 rounded-md text-[10px] font-bold hover:bg-red-100 transition uppercase">Logout</button>
                     </div>
                     
-                    <div class="space-y-4 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+                    <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
                         <div class="grid grid-cols-2 gap-3">
-                            <input type="text" id="in_rt" placeholder="RT" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
-                            <input type="text" id="in_rw" placeholder="RW" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                            <input type="number" id="in_rt" placeholder="RT" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                            <input type="number" id="in_rw" placeholder="RW" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                         </div>
-                        <input type="text" id="in_nomor" placeholder="Nomor Surat" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        <input type="text" id="in_nomor" placeholder="Nomor Surat (Contoh: 01)" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                         <input type="text" id="in_nama" placeholder="Nama Lengkap" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
-                        <input type="text" id="in_nik" placeholder="NIK" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        <input type="number" id="in_nik" placeholder="NIK (16 Digit)" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                         <input type="text" id="in_ttl" placeholder="Tempat, Tgl Lahir" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                         <select id="in_jk" class="w-full p-2 border rounded-lg input-focus outline-none" onchange="updatePreview()">
                             <option value="">Jenis Kelamin</option>
@@ -95,7 +104,7 @@
                         <input type="text" id="in_agama" placeholder="Agama" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                         <input type="text" id="in_pekerjaan" placeholder="Pekerjaan" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                         <textarea id="in_alamat" placeholder="Alamat Lengkap" rows="2" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()"></textarea>
-                        <textarea id="in_keperluan" placeholder="Keperluan" rows="2" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()"></textarea>
+                        <textarea id="in_keperluan" placeholder="Keperluan Surat" rows="2" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()"></textarea>
                         <input type="text" id="in_tgl_surat" placeholder="Tanggal Surat" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
                     </div>
 
@@ -107,56 +116,59 @@
                         
                         <button onclick="sendToWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase flex items-center justify-center gap-2">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
-                            Kirim via WhatsApp
+                            Kirim WhatsApp Admin
                         </button>
-
-                        <button onclick="sendToAdminEmail()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase tracking-wide">Kirim via Email</button>
                         <button onclick="resetForm()" class="text-gray-400 text-[10px] mt-2 hover:underline">Kosongkan Formulir</button>
                     </div>
                 </div>
             </div>
 
             <div class="w-full lg:w-2/3 flex flex-col items-center">
-                <div id="print-paper" class="bg-white w-full p-10 md:p-16 shadow-2xl rounded-sm print-area paper border border-gray-200 min-h-[1000px]">
-                    <div class="text-center border-b-4 border-double border-black pb-4 mb-4">
-                        <h1 class="text-xl font-bold uppercase tracking-tight">Pemerintah Desa Rambatan Wetan</h1>
-                        <h1 class="text-xl font-bold uppercase tracking-tight">Kecamatan Sindang Kabupaten Indramayu</h1>
-                        <p class="text-[16px] font-bold mt-2 uppercase">RT <span id="out_rt_head">……</span> / RW <span id="out_rw_head">……</span> DESA RAMBATAN WETAN</p>
+                <div id="print-paper" class="bg-white shadow-2xl rounded-sm print-area paper pdf-content">
+                    <div class="text-center border-b-4 border-double border-black pb-2 mb-6">
+                        <h1 class="text-2xl font-bold uppercase">Pemerintah Desa Rambatan Wetan</h1>
+                        <h1 class="text-xl font-bold uppercase">Kecamatan Sindang Kabupaten Indramayu</h1>
+                        <p class="text-lg font-bold mt-1 uppercase">RT <span id="out_rt_head">……</span> / RW <span id="out_rw_head">……</span></p>
                     </div>
 
-                    <div class="text-center mb-6">
-                        <h2 class="text-lg font-bold underline uppercase decoration-1 underline-offset-4">SURAT PENGANTAR</h2>
-                        <p class="text-[15px]">Nomor: <span id="out_nomor">…… / RT …… / …… / ……</span></p>
+                    <div class="text-center mb-8">
+                        <h2 class="text-xl font-bold underline uppercase decoration-1 underline-offset-4">SURAT PENGANTAR</h2>
+                        <p class="text-[17px]">Nomor: <span id="out_nomor">……</span> / RT <span id="out_rt_num">……</span> / <span id="out_month_rom">……</span> / <span id="out_year">2026</span></p>
                     </div>
 
-                    <div class="text-[15px] mt-4">
-                        <p class="mb-6 text-justify leading-relaxed">
-                            Yang bertanda tangan di bawah ini Ketua RT <span id="out_rt_body">……</span> RW <span id="out_rw_body">……</span> Desa Rambatan Wetan menerangkan bahwa :
+                    <div class="text-[17px] mt-4">
+                        <p class="mb-6 text-justify">
+                            Yang bertanda tangan di bawah ini Ketua RT <span id="out_rt_body">……</span> RW <span id="out_rw_body">……</span> Desa Rambatan Wetan, Kecamatan Sindang, Kabupaten Indramayu, dengan ini menerangkan bahwa:
                         </p>
 
-                        <table class="w-full mb-6 ml-6 border-separate border-spacing-y-1">
-                            <tr><td width="30%">Nama</td><td width="2%">:</td><td class="font-bold uppercase" id="out_nama">............................................</td></tr>
-                            <tr><td>NIK</td><td>:</td><td id="out_nik">............................................</td></tr>
-                            <tr><td>Tempat / Tgl Lahir</td><td>:</td><td id="out_ttl">............................................</td></tr>
-                            <tr><td>Jenis Kelamin</td><td>:</td><td id="out_jk">............................................</td></tr>
-                            <tr><td>Agama</td><td>:</td><td id="out_agama">............................................</td></tr>
-                            <tr><td>Pekerjaan</td><td>:</td><td id="out_pekerjaan">............................................</td></tr>
-                            <tr><td valign="top">Alamat</td><td valign="top">:</td><td id="out_alamat">............................................</td></tr>
+                        <table class="w-full mb-8 ml-8 border-separate border-spacing-y-2">
+                            <tr><td width="30%">Nama Lengkap</td><td width="2%">:</td><td class="font-bold uppercase" id="out_nama">..............................</td></tr>
+                            <tr><td>NIK</td><td>:</td><td id="out_nik">..............................</td></tr>
+                            <tr><td>Tempat / Tgl Lahir</td><td>:</td><td id="out_ttl">..............................</td></tr>
+                            <tr><td>Jenis Kelamin</td><td>:</td><td id="out_jk">..............................</td></tr>
+                            <tr><td>Agama</td><td>:</td><td id="out_agama">..............................</td></tr>
+                            <tr><td>Pekerjaan</td><td>:</td><td id="out_pekerjaan">..............................</td></tr>
+                            <tr><td valign="top">Alamat</td><td valign="top">:</td><td id="out_alamat" class="leading-snug">..............................</td></tr>
                         </table>
 
-                        <p class="mb-4 text-justify leading-relaxed">Berdasarkan hasil peninjauan dan pengecekan langsung kepada yang bersangkutan, benar bahwa nama tersebut di atas merupakan warga kami yang berdomisili di Desa Rambatan Wetan.</p>
+                        <p class="mb-4 text-justify">Orang tersebut di atas adalah benar warga kami yang berdomisili di RT <span id="out_rt_bottom">……</span> RW <span id="out_rw_bottom">……</span> Desa Rambatan Wetan dan memiliki kelakuan baik.</p>
                         
-                        <p class="mb-1 font-bold">Keperluan :</p>
-                        <p class="mb-8 font-bold border-b border-black inline-block min-w-[300px]" id="out_keperluan">..................................................................................</p>
-                        <p class="mb-12">Demikian surat pengantar ini dibuat untuk dipergunakan sebagaimana mestinya.</p>
+                        <div class="mb-6">
+                            <p class="font-bold">Maksud / Keperluan :</p>
+                            <p class="p-3 border-b border-black italic font-semibold" id="out_keperluan">..................................................................................</p>
+                        </div>
+
+                        <p class="mb-12 text-justify">Demikian surat pengantar ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana mestinya.</p>
                     </div>
 
-                    <div class="flex justify-between text-[15px]">
-                        <div class="text-center w-48"></div>
+                    <div class="flex justify-between text-[17px]">
+                        <div class="text-center w-48">
+                            <p class="mb-20">Mengetahui,<br>Ketua RW <span id="out_rw_sign">……</span></p>
+                            <p class="font-bold underline uppercase">( .......................... )</p>
+                        </div>
                         <div class="text-center w-64">
-                            <p>Rambatan Wetan, <span id="out_tgl_header">........ 20.....</span></p>
-                            <p>Ketua RT <span id="out_rt_sign">……</span> RW <span id="out_rw_sign">……</span></p>
-                            <div class="h-24"></div>
+                            <p>Rambatan Wetan, <span id="out_tgl_header">........ 2026</span></p>
+                            <p class="mb-20">Ketua RT <span id="out_rt_sign">……</span></p>
                             <p class="font-bold underline uppercase">( <span id="out_nama_sign">..........................</span> )</p>
                         </div>
                     </div>
@@ -171,19 +183,16 @@
         const INPUT_IDS = ['in_rt', 'in_rw', 'in_nomor', 'in_nama', 'in_nik', 'in_ttl', 'in_jk', 'in_agama', 'in_pekerjaan', 'in_alamat', 'in_keperluan', 'in_tgl_surat'];
 
         window.onload = () => {
-            // Cek status login
             if (localStorage.getItem("isLoggedIn") === "true") {
                 document.getElementById('login-screen').classList.add('hidden');
                 document.getElementById('main-app').classList.remove('hidden');
             }
 
-            // Load draft data dari penyimpanan lokal
             INPUT_IDS.forEach(id => {
                 const savedVal = localStorage.getItem(`draft_${id}`);
                 if (savedVal) document.getElementById(id).value = savedVal;
             });
 
-            // Set tanggal hari ini jika kosong
             if(!document.getElementById('in_tgl_surat').value) {
                 const now = new Date();
                 const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -214,8 +223,8 @@
 
         function updatePreview() {
             const mappings = {
-                'in_rt': ['out_rt_head', 'out_rt_body', 'out_rt_sign'],
-                'in_rw': ['out_rw_head', 'out_rw_body', 'out_rw_sign'],
+                'in_rt': ['out_rt_head', 'out_rt_body', 'out_rt_sign', 'out_rt_num', 'out_rt_bottom'],
+                'in_rw': ['out_rw_head', 'out_rw_body', 'out_rw_sign', 'out_rw_bottom'],
                 'in_nomor': ['out_nomor'],
                 'in_nama': ['out_nama', 'out_nama_sign'],
                 'in_nik': ['out_nik'],
@@ -228,11 +237,15 @@
                 'in_tgl_surat': ['out_tgl_header']
             };
 
+            const now = new Date();
+            const romawi = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+            document.getElementById('out_month_rom').innerText = romawi[now.getMonth()];
+            document.getElementById('out_year').innerText = now.getFullYear();
+
             for (let id in mappings) {
                 const el = document.getElementById(id);
                 const val = el ? el.value : '';
                 
-                // Simpan otomatis ke memori browser
                 if(val) localStorage.setItem(`draft_${id}`, val);
 
                 mappings[id].forEach(targetId => {
@@ -243,50 +256,37 @@
             }
         }
 
-        function sendToWhatsApp() {
-            const targetNomor = "628981455222";
-            const nama = document.getElementById('in_nama').value || "(Belum diisi)";
-            const rt = document.getElementById('in_rt').value || "……";
-            const rw = document.getElementById('in_rw').value || "……";
-            const nik = document.getElementById('in_nik').value || "(Belum diisi)";
-            const keperluan = document.getElementById('in_keperluan').value || "(Belum diisi)";
-            const tgl = document.getElementById('in_tgl_surat').value;
-
-            const pesan = `*PENGAJUAN SURAT PENGANTAR RT*\n` +
-                          `*Desa Rambatan Wetan*\n` +
-                          `----------------------------------------\n` +
-                          `*Nama:* ${nama.toUpperCase()}\n` +
-                          `*NIK:* ${nik}\n` +
-                          `*RT/RW:* ${rt}/${rw}\n` +
-                          `*Keperluan:* ${keperluan}\n` +
-                          `*Tanggal:* ${tgl}\n` +
-                          `----------------------------------------\n\n` +
-                          `Mohon bantuan Bapak/Ibu Admin untuk diproses. Terima kasih.`;
-
-            window.open(`https://wa.me/${targetNomor}?text=${encodeURIComponent(pesan)}`, '_blank');
-        }
-
-        function sendToAdminEmail() {
-            const emailTujuan = "rambatanwetan03@gmail.com";
-            const nama = document.getElementById('in_nama').value || "(Belum diisi)";
-            const rt = document.getElementById('in_rt').value || "……";
-            const rw = document.getElementById('in_rw').value || "……";
-            const subject = `PENGAJUAN SURAT RT ${rt}/RW ${rw} - ${nama}`;
-            const body = `Halo Admin,\n\nBerikut pengajuan surat pengantar warga atas nama ${nama}.\n\nTerima kasih.`;
-            window.location.href = `mailto:${emailTujuan}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-        }
-
         function saveAsPDF() {
             const element = document.getElementById('print-paper');
             const nama = document.getElementById('in_nama').value || 'Warga';
             const opt = {
-                margin: 0.5,
-                filename: `Surat_RT_${nama.replace(/\s+/g, '_')}.pdf`,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2 },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+                margin: 0,
+                filename: `Surat_Pengantar_${nama.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
             };
             html2pdf().set(opt).from(element).save();
+        }
+
+        function sendToWhatsApp() {
+            const targetNomor = "628981455222";
+            const nama = document.getElementById('in_nama').value || "(Belum diisi)";
+            const nik = document.getElementById('in_nik').value || "-";
+            const rt = document.getElementById('in_rt').value || "?";
+            const rw = document.getElementById('in_rw').value || "?";
+            const keperluan = document.getElementById('in_keperluan').value || "-";
+
+            const pesan = `*PENGAJUAN SURAT PENGANTAR*\n` +
+                          `--------------------------------\n` +
+                          `*Nama:* ${nama.toUpperCase()}\n` +
+                          `*NIK:* ${nik}\n` +
+                          `*RT/RW:* ${rt}/${rw}\n` +
+                          `*Keperluan:* ${keperluan}\n` +
+                          `--------------------------------\n` +
+                          `Mohon diproses untuk surat resminya. Terima kasih.`;
+
+            window.open(`https://wa.me/${targetNomor}?text=${encodeURIComponent(pesan)}`, '_blank');
         }
 
         function resetForm() {
