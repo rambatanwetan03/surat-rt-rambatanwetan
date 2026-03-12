@@ -1,291 +1,413 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Surat Pengantar RT - Rambatan Wetan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
 
-<title>Sistem Surat Pengantar RT</title>
+        @media print {
+            .no-print { display: none !important; }
+            .print-area { border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; box-shadow: none !important; }
+            body { background-color: white !important; }
+        }
 
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+        .paper {
+            font-family: 'Times New Roman', Times, serif;
+            line-height: 1.6;
+            background-color: white;
+            color: black;
+        }
 
-<style>
+        #login-screen {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+        }
 
-body{
-font-family:Arial;
-background:#f1f5f9;
-}
+        .input-focus:focus {
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
 
-.paper{
-font-family:"Times New Roman";
-background:white;
-padding:40px;
-}
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        
+        .pdf-content {
+            width: 210mm;
+            min-height: 297mm;
+            padding: 20mm;
+            margin: auto;
+        }
 
-canvas{
-touch-action:none;
-}
-
-</style>
+        #signature-pad {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            cursor: crosshair;
+            touch-action: none;
+            background: #f8fafc;
+        }
+    </style>
 </head>
-
-<body>
-
-<div class="max-w-6xl mx-auto p-6 grid md:grid-cols-2 gap-6">
-
-<!-- FORM -->
-<div class="bg-white p-6 rounded-xl shadow">
-
-<h2 class="font-bold text-xl mb-4">Data Surat</h2>
-
-<input id="in_nama" placeholder="Nama Lengkap"
-class="w-full border p-2 mb-2">
-
-<input id="in_nik" placeholder="NIK"
-class="w-full border p-2 mb-2">
-
-<textarea id="in_alamat" placeholder="Alamat"
-class="w-full border p-2 mb-2"></textarea>
-
-<textarea id="in_keperluan" placeholder="Keperluan"
-class="w-full border p-2 mb-4"></textarea>
-
-<!-- TANDA TANGAN -->
-<label class="font-bold">Tanda Tangan Ketua RT</label>
-
-<canvas id="signature-pad"
-width="300"
-height="150"
-style="border:2px solid black;background:white;"></canvas>
-
-<div class="flex gap-2 mt-2">
-
-<button onclick="clearSignature()"
-class="bg-gray-600 text-white px-3 py-1 rounded">
-Hapus TTD
-</button>
-
-<button onclick="saveSignature()"
-class="bg-blue-600 text-white px-3 py-1 rounded">
-Gunakan TTD
-</button>
-
-</div>
-
-<div class="mt-6 flex gap-2">
-
-<button onclick="updatePreview()"
-class="bg-green-600 text-white px-4 py-2 rounded">
-Preview
-</button>
-
-<button onclick="savePDF()"
-class="bg-red-600 text-white px-4 py-2 rounded">
-Simpan PDF
-</button>
-
-</div>
-
-</div>
-
-
-<!-- SURAT -->
-<div id="print-area" class="paper shadow">
-
-<h2 style="text-align:center;font-weight:bold">
-SURAT PENGANTAR
-</h2>
-
-<p>
-Yang bertanda tangan di bawah ini Ketua RT menerangkan bahwa:
-</p>
-
-<br>
-
-<table>
-
-<tr>
-<td>Nama</td>
-<td>:</td>
-<td id="out_nama"></td>
-</tr>
-
-<tr>
-<td>NIK</td>
-<td>:</td>
-<td id="out_nik"></td>
-</tr>
-
-<tr>
-<td>Alamat</td>
-<td>:</td>
-<td id="out_alamat"></td>
-</tr>
-
-</table>
-
-<br>
-
-<p>Keperluan:</p>
-
-<p id="out_keperluan"></p>
-
-<br><br>
-
-<div style="text-align:right">
-
-<p>Ketua RT</p>
-
-<br>
-
-<img id="ttd_image"
-style="width:150px">
-
-<br>
-
-<b>( <span id="out_nama_sign"></span> )</b>
-
-</div>
-
-</div>
-
-</div>
-
-
-<script>
-
-// preview data
-
-function updatePreview(){
-
-document.getElementById("out_nama").innerText =
-document.getElementById("in_nama").value
-
-document.getElementById("out_nik").innerText =
-document.getElementById("in_nik").value
-
-document.getElementById("out_alamat").innerText =
-document.getElementById("in_alamat").value
-
-document.getElementById("out_keperluan").innerText =
-document.getElementById("in_keperluan").value
-
-document.getElementById("out_nama_sign").innerText =
-document.getElementById("in_nama").value
-
-}
-
-
-// pdf
-
-function savePDF(){
-
-const element = document.getElementById("print-area")
-
-html2pdf().from(element).save("surat_pengantar.pdf")
-
-}
-
-
-
-// ===========================
-// TANDA TANGAN
-// ===========================
-
-const canvas = document.getElementById("signature-pad")
-const ctx = canvas.getContext("2d")
-
-let drawing=false
-
-function getPosition(event){
-
-const rect = canvas.getBoundingClientRect()
-
-if(event.touches){
-
-return{
-x:event.touches[0].clientX-rect.left,
-y:event.touches[0].clientY-rect.top
-}
-
-}else{
-
-return{
-x:event.clientX-rect.left,
-y:event.clientY-rect.top
-}
-
-}
-
-}
-
-function startDraw(e){
-
-drawing=true
-
-const pos=getPosition(e)
-
-ctx.beginPath()
-
-ctx.moveTo(pos.x,pos.y)
-
-}
-
-function draw(e){
-
-if(!drawing)return
-
-e.preventDefault()
-
-const pos=getPosition(e)
-
-ctx.lineWidth=2
-ctx.lineCap="round"
-
-ctx.lineTo(pos.x,pos.y)
-
-ctx.stroke()
-
-}
-
-function stopDraw(){
-
-drawing=false
-
-}
-
-
-// mouse
-
-canvas.addEventListener("mousedown",startDraw)
-canvas.addEventListener("mousemove",draw)
-canvas.addEventListener("mouseup",stopDraw)
-
-
-// hp
-
-canvas.addEventListener("touchstart",startDraw)
-canvas.addEventListener("touchmove",draw)
-canvas.addEventListener("touchend",stopDraw)
-
-
-
-function clearSignature(){
-
-ctx.clearRect(0,0,canvas.width,canvas.height)
-
-}
-
-
-function saveSignature(){
-
-const dataURL = canvas.toDataURL("image/png")
-
-document.getElementById("ttd_image").src=dataURL
-
-}
-
-</script>
-
+<body class="bg-slate-100 min-h-screen">
+
+    <div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-8 rounded-2xl shadow-2xl w-full max-w-md border border-white/20">
+            <div class="text-center mb-8">
+                <div class="inline-flex items-center justify-center w-16 h-16 bg-blue-100 text-blue-700 rounded-full mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 9h3.75M15 12h3.75M15 15h3.75M4.5 19.5h15a2.25 2.25 0 0 0 2.25-2.25V6.75A2.25 2.25 0 0 0 19.5 4.5h-15a2.25 2.25 0 0 0-2.25 2.25v10.5A2.25 2.25 0 0 0 4.5 19.5Zm6-10.125a1.875 1.875 0 1 1-3.75 0 1.875 1.875 0 0 1 3.75 0Zm1.294 6.336a6.721 6.721 0 0 1-3.17.789 6.721 6.721 0 0 1-3.168-.789 3.376 3.376 0 0 1 6.338 0Z" />
+                    </svg>
+                </div>
+                <h1 class="text-2xl font-bold text-gray-800">Login Sistem RT</h1>
+                <p class="text-gray-500">Desa Rambatan Wetan</p>
+            </div>
+            <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Username</label>
+                    <input type="text" id="username" class="w-full p-3 border border-gray-300 rounded-lg outline-none input-focus" placeholder="Username">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
+                    <div class="relative">
+                        <input type="password" id="password" class="w-full p-3 border border-gray-300 rounded-lg outline-none input-focus pr-12" placeholder="Password">
+                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none">
+                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+                            </svg>
+                            <svg id="eye-slash-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 hidden">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+                <div id="login-error" class="hidden text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded">
+                    Login gagal! Periksa kembali akses Anda.
+                </div>
+                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 rounded-lg transition-all shadow-lg mt-4 active:scale-95">
+                    Masuk
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <div id="main-app" class="hidden p-4 md:p-8">
+        <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-8">
+            
+            <div class="w-full lg:w-1/3 no-print">
+                <div class="bg-white p-6 rounded-2xl shadow-xl sticky top-8 border border-slate-200">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 class="text-xl font-bold text-blue-700">Data Surat</h2>
+                        <button onclick="handleLogout()" class="px-3 py-1 bg-red-50 text-red-600 rounded-md text-[10px] font-bold hover:bg-red-100 transition uppercase">Logout</button>
+                    </div>
+                    
+                    <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="in_rt" placeholder="RT" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                            <input type="number" id="in_rw" placeholder="RW" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        </div>
+                        <input type="text" id="in_nomor" placeholder="Nomor Surat (Contoh: 01)" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        <input type="text" id="in_nama" placeholder="Nama Lengkap" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        <input type="number" id="in_nik" placeholder="NIK (16 Digit)" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        <input type="text" id="in_ttl" placeholder="Tempat, Tgl Lahir" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        <select id="in_jk" class="w-full p-2 border rounded-lg input-focus outline-none" onchange="updatePreview()">
+                            <option value="">Jenis Kelamin</option>
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                        <input type="text" id="in_agama" placeholder="Agama" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        <input type="text" id="in_pekerjaan" placeholder="Pekerjaan" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        <textarea id="in_alamat" placeholder="Alamat Lengkap" rows="2" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()"></textarea>
+                        <textarea id="in_keperluan" placeholder="Keperluan Surat" rows="2" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()"></textarea>
+                        <input type="text" id="in_tgl_surat" placeholder="Tanggal Surat" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        
+                        <!-- Area Tanda Tangan -->
+                        <div class="pt-4 border-t">
+                            <label class="block text-sm font-semibold text-gray-700 mb-2">Tanda Tangan Ketua RT:</label>
+                            <canvas id="signature-pad" width="300" height="150" class="w-full"></canvas>
+                            <div class="flex justify-end mt-2">
+                                <button onclick="clearSignature()" class="text-xs text-red-600 hover:underline">Hapus Tanda Tangan</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex flex-col gap-2 pt-6 mt-4 border-t">
+                        <div class="grid grid-cols-2 gap-2">
+                            <button onclick="saveAsPDF()" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase">Simpan PDF</button>
+                            <button onclick="window.print()" class="bg-slate-700 hover:bg-slate-800 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase">Cetak Print</button>
+                        </div>
+                        
+                        <button onclick="sendToWhatsApp()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 rounded-xl shadow active:scale-95 text-xs uppercase flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>
+                            Kirim WhatsApp Admin
+                        </button>
+                        <button onclick="resetForm()" class="text-gray-400 text-[10px] mt-2 hover:underline">Kosongkan Formulir</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full lg:w-2/3 flex flex-col items-center">
+                <div id="print-paper" class="bg-white shadow-2xl rounded-sm print-area paper pdf-content">
+                    <div class="text-center border-b-4 border-double border-black pb-2 mb-6">
+                        <h1 class="text-2xl font-bold uppercase">Pemerintah Desa Rambatan Wetan</h1>
+                        <h1 class="text-xl font-bold uppercase">Kecamatan Sindang Kabupaten Indramayu</h1>
+                        <p class="text-lg font-bold mt-1 uppercase">RT <span id="out_rt_head">……</span> / RW <span id="out_rw_head">……</span></p>
+                    </div>
+
+                    <div class="text-center mb-8">
+                        <h2 class="text-xl font-bold underline uppercase decoration-1 underline-offset-4">SURAT PENGANTAR</h2>
+                        <p class="text-[17px]">Nomor: <span id="out_nomor">……</span> / RT <span id="out_rt_num">……</span> / <span id="out_month_rom">……</span> / <span id="out_year">2026</span></p>
+                    </div>
+
+                    <div class="text-[17px] mt-4">
+                        <p class="mb-6 text-justify">
+                            Yang bertanda tangan di bawah ini Ketua RT <span id="out_rt_body">……</span> RW <span id="out_rw_body">……</span> Desa Rambatan Wetan, Kecamatan Sindang, Kabupaten Indramayu, dengan ini menerangkan bahwa:
+                        </p>
+
+                        <table class="w-full mb-8 ml-8 border-separate border-spacing-y-2">
+                            <tr><td width="30%">Nama Lengkap</td><td width="2%">:</td><td class="font-bold uppercase" id="out_nama">..............................</td></tr>
+                            <tr><td>NIK</td><td>:</td><td id="out_nik">..............................</td></tr>
+                            <tr><td>Tempat / Tgl Lahir</td><td>:</td><td id="out_ttl">..............................</td></tr>
+                            <tr><td>Jenis Kelamin</td><td>:</td><td id="out_jk">..............................</td></tr>
+                            <tr><td>Agama</td><td>:</td><td id="out_agama">..............................</td></tr>
+                            <tr><td>Pekerjaan</td><td>:</td><td id="out_pekerjaan">..............................</td></tr>
+                            <tr><td valign="top">Alamat</td><td valign="top">:</td><td id="out_alamat" class="leading-snug">..............................</td></tr>
+                        </table>
+
+                        <p class="mb-4 text-justify">Orang tersebut di atas adalah benar warga kami yang berdomisili di RT <span id="out_rt_bottom">……</span> RW <span id="out_rw_bottom">……</span> Desa Rambatan Wetan dan memiliki kelakuan baik.</p>
+                        
+                        <div class="mb-6">
+                            <p class="font-bold">Maksud / Keperluan :</p>
+                            <p class="p-3 border-b border-black italic font-semibold" id="out_keperluan">..................................................................................</p>
+                        </div>
+
+                        <p class="mb-12 text-justify">Demikian surat pengantar ini dibuat dengan sebenarnya untuk dapat dipergunakan sebagaimana mestinya.</p>
+                    </div>
+
+                    <div class="flex justify-between text-[17px]">
+                        <div class="text-center w-48">
+                            <p class="mb-20">Mengetahui,<br>Ketua RW <span id="out_rw_sign">……</span></p>
+                            <p class="font-bold underline uppercase">( .......................... )</p>
+                        </div>
+                        <div class="text-center w-64">
+                            <p>Rambatan Wetan, <span id="out_tgl_header">........ 2026</span></p>
+                            <div class="relative h-28 flex flex-col items-center justify-center">
+                                <p class="z-10 bg-white/80">Ketua RT <span id="out_rt_sign">……</span></p>
+                                <img id="out_signature_img" class="absolute h-24 w-auto object-contain hidden" style="top: 10px;">
+                            </div>
+                            <p class="font-bold underline uppercase">( <span id="out_nama_sign">..........................</span> )</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const VALID_USER = "ramwet";
+        const VALID_PASS = "istimewa03";
+        const INPUT_IDS = ['in_rt', 'in_rw', 'in_nomor', 'in_nama', 'in_nik', 'in_ttl', 'in_jk', 'in_agama', 'in_pekerjaan', 'in_alamat', 'in_keperluan', 'in_tgl_surat'];
+
+        let canvas, ctx, isDrawing = false;
+
+        window.onload = () => {
+            if (localStorage.getItem("isLoggedIn") === "true") {
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+            }
+
+            INPUT_IDS.forEach(id => {
+                const savedVal = localStorage.getItem(`draft_${id}`);
+                if (savedVal) document.getElementById(id).value = savedVal;
+            });
+
+            if(!document.getElementById('in_tgl_surat').value) {
+                const now = new Date();
+                const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+                document.getElementById('in_tgl_surat').value = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+            }
+
+            initSignaturePad();
+            updatePreview();
+        };
+
+        function initSignaturePad() {
+            canvas = document.getElementById('signature-pad');
+            ctx = canvas.getContext('2d');
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.lineCap = 'round';
+
+            // Mouse Events
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseout', stopDrawing);
+
+            // Touch Events
+            canvas.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                startDrawing({ clientX: touch.clientX, clientY: touch.clientY });
+            });
+            canvas.addEventListener('touchmove', (e) => {
+                e.preventDefault();
+                const touch = e.touches[0];
+                draw({ clientX: touch.clientX, clientY: touch.clientY });
+            });
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function startDrawing(e) {
+            isDrawing = true;
+            const rect = canvas.getBoundingClientRect();
+            ctx.beginPath();
+            ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+        }
+
+        function draw(e) {
+            if (!isDrawing) return;
+            const rect = canvas.getBoundingClientRect();
+            ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+            ctx.stroke();
+            updateSignaturePreview();
+        }
+
+        function stopDrawing() {
+            isDrawing = false;
+        }
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            document.getElementById('out_signature_img').classList.add('hidden');
+            document.getElementById('out_signature_img').src = '';
+        }
+
+        function updateSignaturePreview() {
+            const dataURL = canvas.toDataURL('image/png');
+            const img = document.getElementById('out_signature_img');
+            img.src = dataURL;
+            img.classList.remove('hidden');
+        }
+
+        function togglePassword() {
+            const passwordInput = document.getElementById('password');
+            const eyeIcon = document.getElementById('eye-icon');
+            const eyeSlashIcon = document.getElementById('eye-slash-icon');
+            
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                eyeIcon.classList.add('hidden');
+                eyeSlashIcon.classList.remove('hidden');
+            } else {
+                passwordInput.type = 'password';
+                eyeIcon.classList.remove('hidden');
+                eyeSlashIcon.classList.add('hidden');
+            }
+        }
+
+        function handleLogin() {
+            const user = document.getElementById('username').value;
+            const pass = document.getElementById('password').value;
+            if (user === VALID_USER && pass === VALID_PASS) {
+                localStorage.setItem("isLoggedIn", "true");
+                document.getElementById('login-screen').classList.add('hidden');
+                document.getElementById('main-app').classList.remove('hidden');
+            } else {
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function handleLogout() {
+            if(confirm("Keluar dari sistem?")) {
+                localStorage.removeItem("isLoggedIn");
+                location.reload();
+            }
+        }
+
+        function updatePreview() {
+            const mappings = {
+                'in_rt': ['out_rt_head', 'out_rt_body', 'out_rt_sign', 'out_rt_num', 'out_rt_bottom'],
+                'in_rw': ['out_rw_head', 'out_rw_body', 'out_rw_sign', 'out_rw_bottom'],
+                'in_nomor': ['out_nomor'],
+                'in_nama': ['out_nama', 'out_nama_sign'],
+                'in_nik': ['out_nik'],
+                'in_ttl': ['out_ttl'],
+                'in_jk': ['out_jk'],
+                'in_agama': ['out_agama'],
+                'in_pekerjaan': ['out_pekerjaan'],
+                'in_alamat': ['out_alamat'],
+                'in_keperluan': ['out_keperluan'],
+                'in_tgl_surat': ['out_tgl_header']
+            };
+
+            const now = new Date();
+            const romawi = ["I", "II", "III", "IV", "V", "VI", "VII", "VIII", "IX", "X", "XI", "XII"];
+            document.getElementById('out_month_rom').innerText = romawi[now.getMonth()];
+            document.getElementById('out_year').innerText = now.getFullYear();
+
+            for (let id in mappings) {
+                const el = document.getElementById(id);
+                const val = el ? el.value : '';
+                
+                if(val) localStorage.setItem(`draft_${id}`, val);
+
+                mappings[id].forEach(targetId => {
+                    const target = document.getElementById(targetId);
+                    if (val) target.innerText = val;
+                    else target.innerText = (targetId.includes('rt') || targetId.includes('rw')) ? '……' : '..........................';
+                });
+            }
+        }
+
+        function saveAsPDF() {
+            const element = document.getElementById('print-paper');
+            const nama = document.getElementById('in_nama').value || 'Warga';
+            const opt = {
+                margin: 0,
+                filename: `Surat_Pengantar_${nama.replace(/\s+/g, '_')}.pdf`,
+                image: { type: 'jpeg', quality: 1 },
+                html2canvas: { scale: 3, useCORS: true },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+            };
+            html2pdf().set(opt).from(element).save();
+        }
+
+        function sendToWhatsApp() {
+            const targetNomor = "628981455222";
+            const nama = document.getElementById('in_nama').value || "(Belum diisi)";
+            const nik = document.getElementById('in_nik').value || "-";
+            const rt = document.getElementById('in_rt').value || "?";
+            const rw = document.getElementById('in_rw').value || "?";
+            const keperluan = document.getElementById('in_keperluan').value || "-";
+
+            const pesan = `*PENGAJUAN SURAT PENGANTAR*\n` +
+                          `--------------------------------\n` +
+                          `*Nama:* ${nama.toUpperCase()}\n` +
+                          `*NIK:* ${nik}\n` +
+                          `*RT/RW:* ${rt}/${rw}\n` +
+                          `*Keperluan:* ${keperluan}\n` +
+                          `--------------------------------\n` +
+                          `Mohon diproses untuk surat resminya. Terima kasih.`;
+
+            window.open(`https://wa.me/${targetNomor}?text=${encodeURIComponent(pesan)}`, '_blank');
+        }
+
+        function resetForm() {
+            if(confirm('Bersihkan semua data di formulir?')) {
+                INPUT_IDS.forEach(id => {
+                    const el = document.getElementById(id);
+                    if(el) el.value = '';
+                    localStorage.removeItem(`draft_${id}`);
+                });
+                clearSignature();
+                updatePreview();
+            }
+        }
+    </script>
 </body>
 </html>
