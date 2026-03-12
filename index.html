@@ -36,12 +36,20 @@
         .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
         
-        /* Memastikan PDF memiliki ukuran A4 yang konsisten */
         .pdf-content {
             width: 210mm;
             min-height: 297mm;
             padding: 20mm;
             margin: auto;
+        }
+
+        /* Styling Signature Pad */
+        #signature-pad {
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            cursor: crosshair;
+            background-color: #f8fafc;
+            touch-action: none;
         }
     </style>
 </head>
@@ -65,18 +73,7 @@
                 </div>
                 <div>
                     <label class="block text-sm font-semibold text-gray-700 mb-1">Password</label>
-                    <div class="relative">
-                        <input type="password" id="password" class="w-full p-3 border border-gray-300 rounded-lg outline-none input-focus pr-12" placeholder="Password">
-                        <button type="button" onclick="togglePassword()" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600 focus:outline-none">
-                            <svg id="eye-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-                            </svg>
-                            <svg id="eye-slash-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6 hidden">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
-                            </svg>
-                        </button>
-                    </div>
+                    <input type="password" id="password" class="w-full p-3 border border-gray-300 rounded-lg outline-none input-focus" placeholder="Password">
                 </div>
                 <div id="login-error" class="hidden text-red-500 text-sm text-center font-medium bg-red-50 p-2 rounded">
                     Login gagal! Periksa kembali akses Anda.
@@ -117,6 +114,16 @@
                         <textarea id="in_alamat" placeholder="Alamat Lengkap" rows="2" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()"></textarea>
                         <textarea id="in_keperluan" placeholder="Keperluan Surat" rows="2" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()"></textarea>
                         <input type="text" id="in_tgl_surat" placeholder="Tanggal Surat" class="w-full p-2 border rounded-lg input-focus outline-none" oninput="updatePreview()">
+                        
+                        <!-- FITUR TANDA TANGAN -->
+                        <div class="pt-4 border-t">
+                            <label class="block text-sm font-bold text-gray-700 mb-2 uppercase tracking-wide">Tanda Tangan Ketua RT</label>
+                            <canvas id="signature-pad" width="300" height="150" class="w-full"></canvas>
+                            <div class="flex justify-between mt-2">
+                                <button onclick="clearSignature()" class="text-xs text-red-500 hover:underline">Hapus Tanda Tangan</button>
+                                <span class="text-[10px] text-gray-400 italic">Gunakan mouse/jari</span>
+                            </div>
+                        </div>
                     </div>
 
                     <div class="flex flex-col gap-2 pt-6 mt-4 border-t">
@@ -177,9 +184,15 @@
                             <p class="mb-20">Mengetahui,<br>Ketua RW <span id="out_rw_sign">……</span></p>
                             <p class="font-bold underline uppercase">( .......................... )</p>
                         </div>
-                        <div class="text-center w-64">
+                        <div class="text-center w-64 relative">
                             <p>Rambatan Wetan, <span id="out_tgl_header">........ 2026</span></p>
-                            <p class="mb-20">Ketua RT <span id="out_rt_sign">……</span></p>
+                            <p>Ketua RT <span id="out_rt_sign">……</span></p>
+                            
+                            <!-- TEMPAT TANDA TANGAN DI SURAT -->
+                            <div class="h-20 w-full flex items-center justify-center">
+                                <img id="signature-preview" src="" class="max-h-full max-w-full hidden object-contain">
+                            </div>
+
                             <p class="font-bold underline uppercase">( <span id="out_nama_sign">..........................</span> )</p>
                         </div>
                     </div>
@@ -192,6 +205,11 @@
         const VALID_USER = "ramwet";
         const VALID_PASS = "istimewa03";
         const INPUT_IDS = ['in_rt', 'in_rw', 'in_nomor', 'in_nama', 'in_nik', 'in_ttl', 'in_jk', 'in_agama', 'in_pekerjaan', 'in_alamat', 'in_keperluan', 'in_tgl_surat'];
+
+        // Logic Signature
+        const canvas = document.getElementById('signature-pad');
+        const ctx = canvas.getContext('2d');
+        let isDrawing = false;
 
         window.onload = () => {
             if (localStorage.getItem("isLoggedIn") === "true") {
@@ -210,22 +228,64 @@
                 document.getElementById('in_tgl_surat').value = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
             }
 
+            initSignaturePad();
             updatePreview();
         };
 
-        function togglePassword() {
-            const passwordInput = document.getElementById('password');
-            const eyeIcon = document.getElementById('eye-icon');
-            const eyeSlashIcon = document.getElementById('eye-slash-icon');
+        function initSignaturePad() {
+            ctx.lineWidth = 2.5;
+            ctx.lineCap = 'round';
+            ctx.strokeStyle = '#000000';
+
+            const startDrawing = (e) => {
+                isDrawing = true;
+                draw(e);
+            };
+
+            const stopDrawing = () => {
+                isDrawing = false;
+                ctx.beginPath();
+                updateSignaturePreview();
+            };
+
+            const draw = (e) => {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const x = (e.clientX || e.touches[0].clientX) - rect.left;
+                const y = (e.clientY || e.touches[0].clientY) - rect.top;
+
+                ctx.lineTo(x, y);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+            };
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDrawing(e.touches[0]); });
+            canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+            canvas.addEventListener('touchend', stopDrawing);
+        }
+
+        function clearSignature() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            updateSignaturePreview();
+        }
+
+        function updateSignaturePreview() {
+            const preview = document.getElementById('signature-preview');
+            // Cek apakah canvas kosong (isinya cuma background)
+            const blank = document.createElement('canvas');
+            blank.width = canvas.width;
+            blank.height = canvas.height;
             
-            if (passwordInput.type === 'password') {
-                passwordInput.type = 'text';
-                eyeIcon.classList.add('hidden');
-                eyeSlashIcon.classList.remove('hidden');
+            if (canvas.toDataURL() === blank.toDataURL()) {
+                preview.classList.add('hidden');
+                preview.src = '';
             } else {
-                passwordInput.type = 'password';
-                eyeIcon.classList.remove('hidden');
-                eyeSlashIcon.classList.add('hidden');
+                preview.src = canvas.toDataURL();
+                preview.classList.remove('hidden');
             }
         }
 
@@ -323,6 +383,7 @@
                     if(el) el.value = '';
                     localStorage.removeItem(`draft_${id}`);
                 });
+                clearSignature();
                 updatePreview();
             }
         }
